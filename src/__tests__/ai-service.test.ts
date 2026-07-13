@@ -48,7 +48,7 @@ describe('ChatAI', () => {
       const onDone = jest.fn();
       const onError = jest.fn();
 
-      await chat.streamChat('test-model', onClientEvent, onDone, onError);
+      await chat.streamChat('test-model', onClientEvent, onDone, onError, undefined, true);
 
       expect(onError).toHaveBeenCalled();
       expect((onError.mock.calls[0][0] as Error).message).toContain('Network error');
@@ -71,7 +71,7 @@ describe('ChatAI', () => {
       const onDone = jest.fn();
       const onError = jest.fn();
 
-      await chat.streamChat('test-model', onClientEvent, onDone, onError);
+      await chat.streamChat('test-model', onClientEvent, onDone, onError, undefined, true);
 
       expect(onError).toHaveBeenCalled();
       expect((onError.mock.calls[0][0] as Error).message).toContain('401');
@@ -110,7 +110,7 @@ describe('ChatAI', () => {
       const onDone = jest.fn();
       const onError = jest.fn();
 
-      await chat.streamChat('test-model', onClientEvent, onDone, onError);
+      await chat.streamChat('test-model', onClientEvent, onDone, onError, undefined, true);
 
       // Should have received content chunks
       expect(onClientEvent).toHaveBeenCalled();
@@ -168,7 +168,7 @@ describe('ChatAI', () => {
       const onDone = jest.fn();
       const onError = jest.fn();
 
-      await chat.streamChat('test-model', onClientEvent, onDone, onError);
+      await chat.streamChat('test-model', onClientEvent, onDone, onError, undefined, true);
 
       expect(onClientEvent).toHaveBeenCalled();
       expect((onClientEvent.mock.calls[0][0] as ClientEvent)).toEqual({
@@ -238,7 +238,7 @@ describe('ChatAI', () => {
       const onDone = jest.fn();
       const onError = jest.fn();
 
-      await chat.streamChat('test-model', onClientEvent, onDone, onError);
+      await chat.streamChat('test-model', onClientEvent, onDone, onError, undefined, true);
 
       // Should have tool call events
       const toolCallEvents = (onClientEvent.mock.calls as unknown as ClientEvent[][]).filter(
@@ -317,7 +317,7 @@ describe('ChatAI', () => {
       const onDone = jest.fn();
       const onError = jest.fn();
 
-      await chat.streamChat('test-model', onClientEvent, onDone, onError);
+      await chat.streamChat('test-model', onClientEvent, onDone, onError, undefined, true);
 
       // Should have two tool calls
       const toolCallEvents = (onClientEvent.mock.calls as unknown as ClientEvent[][]).filter(

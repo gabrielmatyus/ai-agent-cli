@@ -160,9 +160,9 @@ export class ChatAI {
       onClientEvent: (event: ClientEvent) => void,
       onDone: (text: string) => void,
       onError: (error: Error) => void,
-      onResponse?: (response: ChatMessage[]) => void
+      onResponse?: (response: ChatMessage[]) => void,
+      live = false
     ): Promise<void> {
-      const live = false
       let i = 0
       this.onClientEvent = onClientEvent
 

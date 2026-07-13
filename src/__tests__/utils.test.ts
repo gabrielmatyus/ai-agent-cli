@@ -53,7 +53,7 @@ describe('utils', () => {
 
     beforeEach(() => {
       ctx = { paddingLeft: 0 };
-      tree = { rowsLength: 0, uniqueId: 0, columns: 80, node: { type: 'box', children: [] }, items: [] };
+      tree = { rowsCount: 0, uniqueId: 0, columns: 80, node: { type: 'box', children: [] }, items: [] };
     });
 
     it('should render a text node as a single row with one column', () => {
@@ -166,7 +166,7 @@ describe('utils', () => {
         node: { type: 'box', children: [] },
         uniqueId: 0,
         items: [],
-        rowsLength: 0,
+        rowsCount: 0,
         columns: 80,
       };
     });
@@ -175,7 +175,7 @@ describe('utils', () => {
       setTreeRole(AssistantRolesEnum.user, AssistantRolesEnum.user, tree, 'User message');
       expect(tree.items).toHaveLength(1);
       expect(tree.items[0].baseRole).toBe(AssistantRolesEnum.user);
-      expect(tree.rowsLength).toBeGreaterThan(0);
+      expect(tree.rowsCount).toBeGreaterThan(0);
     });
 
     it('should update user prompt value on second call', () => {
@@ -200,7 +200,7 @@ describe('utils', () => {
         node: { type: 'box', children: [] },
         uniqueId: 0,
         items: [],
-        rowsLength: 0,
+        rowsCount: 0,
         columns: 80,
       };
     });
@@ -246,7 +246,7 @@ describe('utils', () => {
         node: { type: 'box', children: [] },
         uniqueId: 0,
         items: [],
-        rowsLength: 0,
+        rowsCount: 0,
         columns: 80,
       };
     });
@@ -272,7 +272,7 @@ describe('utils', () => {
         node: { type: 'box', children: [] },
         uniqueId: 0,
         items: [],
-        rowsLength: 0,
+        rowsCount: 0,
         columns: 80,
       };
       setTreeRole(AssistantRolesEnum.user, AssistantRolesEnum.user, tree, 'Test prompt');
@@ -289,7 +289,7 @@ describe('utils', () => {
         node: { type: 'box', children: [] },
         uniqueId: 0,
         items: [],
-        rowsLength: 0,
+        rowsCount: 0,
         columns: 80,
       };
       expect(() => setupSelectedTree(emptyTree, 0)).not.toThrow();
@@ -304,7 +304,7 @@ describe('utils', () => {
         node: { type: 'box', children: [] },
         uniqueId: 0,
         items: [],
-        rowsLength: 0,
+        rowsCount: 0,
         columns: 80,
       };
     });

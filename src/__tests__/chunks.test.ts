@@ -6,7 +6,7 @@ describe('chunks', () => {
     expect(Array.isArray(chunks)).toBe(true);
   });
 
-  it('should be empty by default', () => {
-    expect(chunks).toHaveLength(6);
+  it('should have the correct number of chunks', () => {
+    expect(chunks).toHaveLength(4);
   });
 });

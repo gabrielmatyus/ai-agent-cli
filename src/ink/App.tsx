@@ -148,6 +148,12 @@ export default function App() {
         } catch (error) {
             processErrorHandler(error as Error);
         }
+        // chatAiRef.current.streamChat(
+        //         process.env.MODEL || undefined,
+        //         processClientEventHandler,
+        //         processDoneHandler,
+        //         processErrorHandler
+        // ).catch((error) => {processErrorHandler(error as Error); })
     }, [loading, processUserMessageHandler, processClientEventHandler, processDoneHandler, processErrorHandler]);
 
     const removeStdOut = useCallback(() => {
