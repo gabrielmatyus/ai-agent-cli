@@ -167,7 +167,6 @@ export class ChatAI {
       this.onClientEvent = onClientEvent
 
       while (true) {
-        //console.log('fecthing', MODEL_URL, model, API_KEY)
         let response: Response
         try {
           response = live ? await fetchResponse(model, this.messages) : await fetchMockResponse(i++)
