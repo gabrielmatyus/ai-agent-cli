@@ -111,6 +111,7 @@ describe('models', () => {
       const node: Node = {
         type: 'box',
         flexDirection: 'column',
+        content: '',
         children: [
           { type: 'text', value: 'Child 1' },
           { type: 'text', value: 'Child 2' },
@@ -127,6 +128,7 @@ describe('models', () => {
       const node: Node = {
         type: 'box',
         flexDirection: 'row',
+        content: '',
         children: [
           { type: 'text', value: 'Left' },
           { type: 'text', value: 'Right' },
@@ -148,19 +150,20 @@ describe('models', () => {
         node: {
           type: 'box',
           flexDirection: 'column',
+          content: '',
           children: [{ type: 'text', value: 'Test' }],
         },
         rows: [],
         selected: false,
-        rowsLength: 0,
+        rowsCount: 0,
       };
 
       const tree: TreeHolder = {
-        node: { type: 'box', children: [] },
+        node: { type: 'box', content: '', children: [] },
         uniqueId: 0,
         items: [treeItem],
-        rowsLength: 0,
         columns: 80,
+        rowsCount: 0
       };
 
       expect(tree.items).toHaveLength(1);
@@ -173,10 +176,10 @@ describe('models', () => {
         baseRole: AssistantRolesEnum.assistant,
         role: AssistantRolesEnum.assistant,
         from: 0,
-        node: { type: 'box', children: [] },
+        node: { type: 'box', children: [], content: '' },
         rows: [],
         selected: true,
-        rowsLength: 0,
+        rowsCount: 0,
       };
       expect(treeItem.selected).toBe(true);
     });

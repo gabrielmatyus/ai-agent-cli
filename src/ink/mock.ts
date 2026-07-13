@@ -5,10 +5,12 @@ export const tree: Node = {
   flexDirection: 'column',
   paddingLeft: 1,
   backgroundColor: '#111',
+  content: '',
   children: [
     {
       type: 'box',
       flexDirection: 'column',
+      content: '',
       children: [
         { type: 'text', value: '> ' },
       ],
@@ -16,11 +18,13 @@ export const tree: Node = {
     {
       type: 'box',
       flexDirection: 'column',
+      content: '',
       children: [
         { type: 'text' },
         {
           type: 'box',
           flexDirection: 'row',
+          content: '',
           children: [
             { type: 'text', value: '+', color: 'yellow' },
             { type: 'text', value: 'Thinking', color: 'yellow', paddingLeft: 1 },

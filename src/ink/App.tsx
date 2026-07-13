@@ -7,14 +7,12 @@ import { highlight } from "cli-highlight";
 import { ChatMessage, Usage, AssistantRolesEnum, ClientEvent } from './models.js'
 import { RenderRow, TreeHolder,  } from './ui-models.js'
 import { Dialog } from './Dialog.js'
-import { executeTool } from './tools.js'
 
 // --- Constants ---
 const INPUT_ROWS = 4
 const SCROLL_JUMP = 5
 const CONTEXT_WINDOW = 200000
 const USAGE_PANEL = 50
-const USAGE_PANEL_CORRECTED = 50
 
 // --- RowView ---
 const RowView = memo(function RowView({ row }: { row: RenderRow }) {
@@ -71,7 +69,7 @@ export default function App() {
     const [renderRows, setRenderRows] = useState<ReactNode[]>([]);
     const [followOutput, setFollowOutput] = useState<boolean>(true)
     const chatAiRef = useRef<ChatAI>(new ChatAI())
-    const [showDialog, setShowDialog] = useState(false)
+    const [showDialog, ] = useState(false)
 
     // Refs for mutation-heavy data (avoid unnecessary state)
     const treeRef = useRef<TreeHolder>({ rowsCount: 0, uniqueId: 0, columns: stdout.columns - USAGE_PANEL, node: { type: 'box', children: [], content: '' }, items: [] });
@@ -148,12 +146,6 @@ export default function App() {
         } catch (error) {
             processErrorHandler(error as Error);
         }
-        // chatAiRef.current.streamChat(
-        //         process.env.MODEL || undefined,
-        //         processClientEventHandler,
-        //         processDoneHandler,
-        //         processErrorHandler
-        // ).catch((error) => {processErrorHandler(error as Error); })
     }, [loading, processUserMessageHandler, processClientEventHandler, processDoneHandler, processErrorHandler]);
 
     const removeStdOut = useCallback(() => {

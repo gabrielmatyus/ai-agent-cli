@@ -53,7 +53,7 @@ describe('utils', () => {
 
     beforeEach(() => {
       ctx = { paddingLeft: 0 };
-      tree = { rowsCount: 0, uniqueId: 0, columns: 80, node: { type: 'box', children: [] }, items: [] };
+      tree = { rowsCount: 0, uniqueId: 0, columns: 80, node: { type: 'box', children: [], content: '', }, items: [] };
     });
 
     it('should render a text node as a single row with one column', () => {
@@ -74,6 +74,7 @@ describe('utils', () => {
       const node: Node = {
         type: 'box',
         flexDirection: 'column',
+        content: '',
         children: [
           { type: 'text', value: 'Line 1' },
           { type: 'text', value: 'Line 2' },
@@ -89,6 +90,7 @@ describe('utils', () => {
       const node: Node = {
         type: 'box',
         flexDirection: 'row',
+        content: '',
         children: [
           { type: 'text', value: 'Left' },
           { type: 'text', value: 'Right' },
@@ -106,6 +108,7 @@ describe('utils', () => {
         type: 'box',
         flexDirection: 'column',
         paddingLeft: 2,
+        content: '',
         children: [{ type: 'text', value: 'Indented' }],
       };
       const rows = render(tree, node, ctx, false);
@@ -117,6 +120,7 @@ describe('utils', () => {
       const node: Node = {
         type: 'box',
         flexDirection: 'column',
+        content: '',
         children: [
           { type: 'text', value: 'Always visible' },
           { type: 'text', value: 'Collapsible text', collapsible: true },
@@ -131,6 +135,7 @@ describe('utils', () => {
       const node: Node = {
         type: 'box',
         flexDirection: 'column',
+        content: '',
         children: [
           { type: 'text', value: 'Always visible' },
           { type: 'text', value: 'Collapsible text', collapsible: true },
@@ -145,6 +150,7 @@ describe('utils', () => {
       const node: Node = {
         type: 'box',
         flexDirection: 'row',
+        content: '',
         children: [
           { type: 'text', value: 'A' },
           { type: 'text', value: 'B' },
@@ -163,7 +169,7 @@ describe('utils', () => {
 
     beforeEach(() => {
       tree = {
-        node: { type: 'box', children: [] },
+        node: { type: 'box', children: [], content: '', },
         uniqueId: 0,
         items: [],
         rowsCount: 0,
@@ -197,7 +203,7 @@ describe('utils', () => {
 
     beforeEach(() => {
       tree = {
-        node: { type: 'box', children: [] },
+        node: { type: 'box', children: [], content: '', },
         uniqueId: 0,
         items: [],
         rowsCount: 0,
@@ -243,7 +249,7 @@ describe('utils', () => {
 
     beforeEach(() => {
       tree = {
-        node: { type: 'box', children: [] },
+        node: { type: 'box', children: [], content: '', },
         uniqueId: 0,
         items: [],
         rowsCount: 0,
@@ -269,7 +275,7 @@ describe('utils', () => {
     beforeEach(() => {
       // Create a tree with a user item and an assistant item
       tree = {
-        node: { type: 'box', children: [] },
+        node: { type: 'box', children: [], content: '', },
         uniqueId: 0,
         items: [],
         rowsCount: 0,
@@ -286,7 +292,7 @@ describe('utils', () => {
 
     it('should not crash when tree has no items', () => {
       const emptyTree: TreeHolder = {
-        node: { type: 'box', children: [] },
+        node: { type: 'box', children: [], content: '', },
         uniqueId: 0,
         items: [],
         rowsCount: 0,
@@ -301,7 +307,7 @@ describe('utils', () => {
     beforeEach(() => {
       // Create a tree with a user item and an assistant item
       tree = {
-        node: { type: 'box', children: [] },
+        node: { type: 'box', children: [], content: '', },
         uniqueId: 0,
         items: [],
         rowsCount: 0,
@@ -313,15 +319,18 @@ describe('utils', () => {
       const node: Node = {
         type: 'box',
         flexDirection: 'column',
+        content: '',
         children: [
           {
             type: 'box',
             flexDirection: 'row',
+            content: '',
             children: [
               { type: 'text', value: 'Left' },
               {
                 type: 'box',
                 flexDirection: 'column',
+                content: '',
                 children: [
                   { type: 'text', value: 'Nested 1' },
                   { type: 'text', value: 'Nested 2' },
@@ -340,7 +349,7 @@ describe('utils', () => {
     });
 
     it('should handle empty box', () => {
-      const node: Node = { type: 'box', flexDirection: 'column', children: [] };
+      const node: Node = { type: 'box', flexDirection: 'column', children: [], content: '', };
       const rows = render(tree, node, { paddingLeft: 0 }, false);
       expect(rows).toHaveLength(0);
     });
@@ -349,6 +358,7 @@ describe('utils', () => {
       const node: Node = {
         type: 'box',
         flexDirection: 'column',
+        content: '',
         children: [{ type: 'text', value: 'Only child' }],
       };
       const rows = render(tree, node, { paddingLeft: 0 }, false);

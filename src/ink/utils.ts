@@ -115,7 +115,7 @@ function setNodeInTree(tree: TreeHolder, treeItem: TreeItem) {
     {
         let strLength = 0
         row.columns.forEach((col) => strLength += (col.value ?? '').length)
-        let rowsCount = Math.ceil(strLength / (tree.columns - (row.paddingLeft ?? 0 ) - (row.borderLeft ? 1 : 0) - 0 ) )
+        const rowsCount = Math.ceil(strLength / (tree.columns - (row.paddingLeft ?? 0 ) - (row.borderLeft ? 1 : 0) - 0 ) )
         row.height = (rowsCount > 1 ? rowsCount : 1)
         row.minHeight = row.height
         row.maxHeight = row.height
