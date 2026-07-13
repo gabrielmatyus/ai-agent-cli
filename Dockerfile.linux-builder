@@ -1,0 +1,28 @@
+FROM node:20-slim
+
+# Install build dependencies for electron-builder Linux targets
+RUN apt-get update && apt-get install -y \
+  rpm \
+  fakeroot \
+  dpkg-dev \
+  snapcraft \
+  squashfs-tools \
+  icoextract \
+  wine64 \
+  wine32 \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+
+# Copy the rest of the app
+COPY . .
+
+# Build the app
+RUN npm run build
+
+# Build Linux packages
+RUN npx electron-builder --linux deb AppImage --config electron-builder.yml

@@ -1,0 +1,42 @@
+{
+  "name": "ai-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AI-powered coding assistant CLI",
+  "author": "example.com",
+  "scripts": {
+    "postinstall": "patch-package",
+    "format": "prettier --write .",
+    "lint": "eslint --cache .",
+    "typecheck": "tsc --noEmit",
+    "start": "node --import tsx/esm src/index.tsx",
+    "build": "tsc",
+    "prod": "node dist/index.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.ts",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.ts --watch"
+  },
+  "dependencies": {
+    "@inkjs/ui": "^2.0.0",
+    "cli-highlight": "^2.1.11",
+    "ink": "^7.1.0",
+    "react": "^19.2.1"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.4.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.20.0",
+    "@types/react": "^19.2.7",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "jest": "^30.4.2",
+    "patch-package": "^8.0.1",
+    "prettier": "^3.7.4",
+    "ts-jest": "^29.4.11",
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.62.1"
+  }
+}

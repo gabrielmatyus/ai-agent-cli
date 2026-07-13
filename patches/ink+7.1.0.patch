@@ -1,0 +1,47 @@
+diff --git a/node_modules/ink/build/hooks/use-input.js b/node_modules/ink/build/hooks/use-input.js
+index 5d83706..6318744 100644
+--- a/node_modules/ink/build/hooks/use-input.js
++++ b/node_modules/ink/build/hooks/use-input.js
+@@ -61,8 +61,12 @@ const useInput = (inputHandler, options = {}) => {
+             capsLock: keypress.capsLock ?? false,
+             numLock: keypress.numLock ?? false,
+             eventType: keypress.eventType,
++            mouse: keypress.mouse
+         };
+         let input;
++        if (keypress.name === 'mouse') {
++            input = '';
++        } else
+         if (keypress.isKittyProtocol) {
+             // Use text-as-codepoints field for printable keys (needed when
+             // reportAllKeysAsEscapeCodes flag is enabled), suppress non-printable
+diff --git a/node_modules/ink/build/parse-keypress.js b/node_modules/ink/build/parse-keypress.js
+index e5129a1..f87d3d8 100644
+--- a/node_modules/ink/build/parse-keypress.js
++++ b/node_modules/ink/build/parse-keypress.js
+@@ -380,6 +380,25 @@ const parseKeypress = (s = '') => {
+     else if (!s) {
+         s = '';
+     }
++    
++    const mouseMatch = /^\x1b\[<(\d+);(\d+);(\d+)([Mm])$/.exec(s);
++    if (mouseMatch) {
++        return {
++            name: 'mouse',
++            mouse: {
++                button: Number(mouseMatch[1]),
++                x: Number(mouseMatch[2]),
++                y: Number(mouseMatch[3]),
++                pressed: mouseMatch[4] === 'M'
++            },
++            ctrl: false,
++            meta: false,
++            shift: false,
++            sequence: s,
++            raw: s
++        };
++    }
++
+     // Try kitty keyboard protocol parsers first
+     const kittyResult = parseKittyKeypress(s);
+     if (kittyResult)
