@@ -10,6 +10,7 @@ import {
   statSync
 } from 'fs'
 import { join, relative, resolve } from 'path'
+import { autoDecision, describeAction, isDestructiveTool } from './confirmation.js'
 
 const baseDir = process.cwd()
 
@@ -148,12 +149,12 @@ export const tools: ToolDefinition[] = [
       parameters: {
         type: 'object',
         properties: {
-          filePath: {
+          path: {
             type: 'string',
             description: 'Path to the file (relative to project root or absolute)'
           }
         },
-        required: ['filePath']
+        required: ['path']
       }
     }
   },
@@ -166,13 +167,13 @@ export const tools: ToolDefinition[] = [
       parameters: {
         type: 'object',
         properties: {
-          filePaths: {
+          path: {
             type: 'array',
             items: { type: 'string' },
             description: 'Array of file paths (relative to project root or absolute)'
           }
         },
-        required: ['filePaths']
+        required: ['path']
       }
     }
   },
@@ -180,21 +181,21 @@ export const tools: ToolDefinition[] = [
     type: 'function',
     function: {
       name: 'write_file',
-      description:
-        'Write content to a file (creates or overwrites). Paths are relative to the project root or absolute.',
+      description: 'Create or overwrite a file with the specified content.',
       parameters: {
         type: 'object',
         properties: {
-          filePath: {
+          path: {
             type: 'string',
-            description: 'Path to the file (relative to project root or absolute)'
+            description: 'File path.'
           },
           content: {
             type: 'string',
-            description: 'Content to write to the file'
+            description: 'Complete contents of the file.'
           }
         },
-        required: ['filePath', 'content']
+        required: ['path', 'content'],
+        additionalProperties: false
       }
     }
   },
@@ -207,7 +208,7 @@ export const tools: ToolDefinition[] = [
       parameters: {
         type: 'object',
         properties: {
-          filePath: {
+          path: {
             type: 'string',
             description: 'Path to the file (relative to project root or absolute)'
           },
@@ -220,7 +221,7 @@ export const tools: ToolDefinition[] = [
             description: 'The replacement text'
           }
         },
-        required: ['filePath', 'oldString', 'newString']
+        required: ['path', 'oldString', 'newString']
       }
     }
   },
@@ -232,7 +233,7 @@ export const tools: ToolDefinition[] = [
       parameters: {
         type: 'object',
         properties: {
-          dirPath: {
+          path: {
             type: 'string',
             description: 'Path to the directory (relative to project root or absolute)'
           },
@@ -241,7 +242,7 @@ export const tools: ToolDefinition[] = [
             description: 'Whether to list recursively (default: false)'
           }
         },
-        required: ['dirPath']
+        required: ['path']
       }
     }
   },
@@ -307,12 +308,12 @@ export const tools: ToolDefinition[] = [
       parameters: {
         type: 'object',
         properties: {
-          dirPath: {
+          path: {
             type: 'string',
             description: 'Path of the directory to create (relative to project root or absolute)'
           }
         },
-        required: ['dirPath']
+        required: ['path']
       }
     }
   },
@@ -324,7 +325,7 @@ export const tools: ToolDefinition[] = [
       parameters: {
         type: 'object',
         properties: {
-          filePath: {
+          path: {
             type: 'string',
             description: 'Path to the file to delete (relative to project root or absolute)'
           }
@@ -383,11 +384,25 @@ export const tools: ToolDefinition[] = [
   }
 ]
 
-export function executeTool(name: string, args: Record<string, unknown>): string {
+export async function execute_tool(
+  name: string,
+  args: Record<string, unknown>,
+  options?: {
+    skipConfirmation?: boolean
+    confirm?: (name: string, args: Record<string, unknown>) => Promise<boolean>
+  }
+): Promise<string> {
+  if (isDestructiveTool(name) && !options?.skipConfirmation) {
+    const decision = autoDecision()
+    const allow = decision ?? (options?.confirm ? await options.confirm(name, args) : false)
+    if (!allow) {
+      return `User denied: ${describeAction(name, args)}`
+    }
+  }
   switch (name) {
     case 'read_file': {
-      const filePath = resolvePath(args.filePath as string)
-      if (!filePath) return 'Error: filePath is required'
+      if (!args.path) return 'Error: filePath is required'
+      const filePath = resolvePath(args.path as string)
       if (!existsSync(filePath)) return `Error: File not found: ${filePath}`
       try {
         return readFileSync(filePath, 'utf-8')
@@ -396,8 +411,8 @@ export function executeTool(name: string, args: Record<string, unknown>): string
       }
     }
     case 'read_multiple_files': {
-      const rawPaths = args.filePaths as string[]
-      if (!rawPaths || !Array.isArray(rawPaths)) return 'Error: filePaths must be an array'
+      const rawPaths = args.path as string[]
+      if (!args.path || !Array.isArray(rawPaths)) return 'Error: path must be an array'
       const parts: string[] = []
       for (const raw of rawPaths) {
         const fp = resolvePath(raw)
@@ -418,10 +433,10 @@ export function executeTool(name: string, args: Record<string, unknown>): string
       return parts.join('\n\n')
     }
     case 'write_file': {
-      const filePath = resolvePath(args.filePath as string)
+      if (!args.path) return 'Error: filePath is required'
+      const filePath = resolvePath(args.path as string)
+      if (args.content === undefined) return 'Error: content is required'
       const content = args.content as string
-      if (!filePath) return 'Error: filePath is required'
-      if (content === undefined) return 'Error: content is required'
       try {
         writeFileSync(filePath, content, 'utf-8')
         return `Successfully wrote ${content.length} bytes to ${filePath}`
@@ -430,12 +445,13 @@ export function executeTool(name: string, args: Record<string, unknown>): string
       }
     }
     case 'edit_file': {
-      const filePath = resolvePath(args.filePath as string)
+      if (!args.path) return 'Error: filePath is required'
+      if (!args.oldString) return 'Error: oldString is required'
+      if (!args.newString) return 'Error: newString is required'
+
+      const filePath = resolvePath(args.path as string)
       const oldString = args.oldString as string
       const newString = args.newString as string
-      if (!filePath) return 'Error: filePath is required'
-      if (!oldString) return 'Error: oldString is required'
-      if (newString === undefined) return 'Error: newString is required'
       if (!existsSync(filePath)) return `Error: File not found: ${filePath}`
       try {
         const content = readFileSync(filePath, 'utf-8')
@@ -450,9 +466,9 @@ export function executeTool(name: string, args: Record<string, unknown>): string
       }
     }
     case 'list_directory': {
-      const dirPath = resolvePath(args.dirPath as string)
+      if (!args.path) return 'Error: dirPath is required'
+      const dirPath = resolvePath(args.path as string)
       const recursive = args.recursive as boolean | undefined
-      if (!dirPath) return 'Error: dirPath is required'
       if (!existsSync(dirPath)) return `Error: Directory not found: ${dirPath}`
       try {
         if (recursive) {
@@ -476,10 +492,10 @@ export function executeTool(name: string, args: Record<string, unknown>): string
       }
     }
     case 'glob_files': {
+      if (!args.basePath) return 'Error: basePath is required'
+      if (!args.pattern) return 'Error: pattern is required'
       const basePath = resolvePath(args.basePath as string)
       const pattern = args.pattern as string
-      if (!basePath) return 'Error: basePath is required'
-      if (!pattern) return 'Error: pattern is required'
       if (!existsSync(basePath)) return `Error: Directory not found: ${basePath}`
       try {
         const matches = globFiles(basePath, pattern)
@@ -489,12 +505,12 @@ export function executeTool(name: string, args: Record<string, unknown>): string
       }
     }
     case 'grep_search': {
+      if (!args.basePath) return 'Error: basePath is required'
+      if (!args.pattern) return 'Error: pattern is required'
       const basePath = resolvePath(args.basePath as string)
       const pattern = args.pattern as string
       const includePattern = args.includePattern as string | undefined
       const maxResults = (args.maxResults as number | undefined) || 50
-      if (!basePath) return 'Error: basePath is required'
-      if (!pattern) return 'Error: pattern is required'
       if (!existsSync(basePath)) return `Error: Directory not found: ${basePath}`
       try {
         return grepFiles(basePath, pattern, includePattern, maxResults)
@@ -503,8 +519,8 @@ export function executeTool(name: string, args: Record<string, unknown>): string
       }
     }
     case 'create_directory': {
-      const dirPath = resolvePath(args.dirPath as string)
-      if (!dirPath) return 'Error: dirPath is required'
+      if (!args.path) return 'Error: dirPath is required'
+      const dirPath = resolvePath(args.path as string)
       try {
         mkdirSync(dirPath, { recursive: true })
         return `Successfully created directory: ${dirPath}`
@@ -513,8 +529,8 @@ export function executeTool(name: string, args: Record<string, unknown>): string
       }
     }
     case 'delete_file': {
-      const filePath = resolvePath(args.filePath as string)
-      if (!filePath) return 'Error: filePath is required'
+      if (!args.path) return 'Error: filePath is required'
+      const filePath = resolvePath(args.path as string)
       if (!existsSync(filePath)) return `Error: File not found: ${filePath}`
       try {
         unlinkSync(filePath)
@@ -533,7 +549,8 @@ export function executeTool(name: string, args: Record<string, unknown>): string
           cwd: workdir,
           timeout,
           encoding: 'utf-8',
-          maxBuffer: 10 * 1024 * 1024
+          maxBuffer: 10 * 1024 * 1024,
+          stdio: ['ignore', 'pipe', 'pipe']
         })
         return output || '(command completed with no output)'
       } catch (err: unknown) {
@@ -552,10 +569,10 @@ export function executeTool(name: string, args: Record<string, unknown>): string
       }
     }
     case 'rename_file': {
+      if (!args.oldPath) return 'Error: oldPath is required'
+      if (!args.newPath) return 'Error: newPath is required'
       const oldPath = resolvePath(args.oldPath as string)
       const newPath = resolvePath(args.newPath as string)
-      if (!oldPath) return 'Error: oldPath is required'
-      if (!newPath) return 'Error: newPath is required'
       if (!existsSync(oldPath)) return `Error: File not found: ${oldPath}`
       if (existsSync(newPath)) return `Error: Target already exists: ${newPath}`
       try {

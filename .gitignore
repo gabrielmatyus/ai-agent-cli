@@ -39,3 +39,6 @@ lerna-debug.log*
 .turbo/
 
 session.txt
+
+coverage/
+src/ink/mocks/
