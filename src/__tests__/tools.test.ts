@@ -93,7 +93,6 @@ describe.skip('tools', () => {
     describe('write_file', () => {
       it('should write content to a file', async () => {
         const filePath = path.join(testDir, 'output.txt')
-        console.log('filePath', filePath)
         const result = await execute_tool('write_file', { path: filePath, content: 'Test content' })
         expect(result).toContain('Successfully wrote')
         expect(readFileSync(filePath, 'utf-8')).toBe('Test content')

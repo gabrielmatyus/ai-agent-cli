@@ -952,7 +952,6 @@ describe('ChatAI', () => {
             controller.close()
           }
         })
-        console.log('STEP=', step)
         const response = Promise.resolve({
           ok: true,
           status: 200,
