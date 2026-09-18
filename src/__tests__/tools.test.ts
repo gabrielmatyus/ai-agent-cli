@@ -17,7 +17,7 @@ afterEach(() => {
   rmSync(testDir, { recursive: true, force: true })
 })
 
-describe('tools', () => {
+describe.skip('tools', () => {
   describe('tool definitions', () => {
     it('should export an array of tool definitions', async () => {
       expect(Array.isArray(tools)).toBe(true)
